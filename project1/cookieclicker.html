@@ -178,46 +178,46 @@
         }
    
         class Autoclicker {
-            constructor(price) {
-                this.price = price;
-                this.count = 0;
-            }
-   
-            createButton() {
-                const button = document.createElement('button');
-                button.id = 'autoclicker-button';
-                button.textContent = `Autoclicker - Kosten: ${this.price} klikken`;
-                button.disabled = false; // Autoclicker knop is standaard actief
-                return button;
-            }
-   
-            buyAutoclicker(game) {
-                if (game.count >= this.price) {
-                    game.count -= this.price;
-                    this.count += 1;
-                    game.updateClickCount();
-                    game.updateAutoclickerCount();
-                    game.saveProgress();
+    constructor(price) {
+        this.price = price;
+        this.count = 0;
+    }
 
-                    // Verhoog de prijs voor de volgende autoclicker met 1,2
-                    this.price = Math.round(this.price * 1.2);
+    createButton() {
+        const button = document.createElement('button');
+        button.id = 'autoclicker-button';
+        button.textContent = `Autoclicker - Kosten: ${this.price} klikken`;
+        button.disabled = false;
+        return button;
+    }
 
-                    // Update de knop tekst met de nieuwe prijs
-                    const autoclickerButton = document.getElementById('autoclicker-button');
-                    autoclickerButton.textContent = `Autoclicker - Kosten: ${this.price} klikken`;
-                }
+    buyAutoclicker(game) {
+        if (game.count >= this.price) {
+            game.count -= this.price;
+            this.count += 1;
+            game.updateClickCount();
+            game.updateAutoclickerCount();
+            game.saveProgress();
+
+            // Verhoog de prijs voor de volgende autoclicker met 1,2
+            this.price = Math.round(this.price * 1.2);
+
+            // Update de knop tekst met de nieuwe prijs
+            const autoclickerButton = document.getElementById('autoclicker-button');
+            autoclickerButton.textContent = `Autoclicker - Kosten: ${this.price} klikken`;
+        }
+    }
+
+    startAutoclicker(game) {
+        setInterval(() => {
+            if (this.count > 0) {
+                game.count += this.count * 3; // Verhoogt de clicks met 5 keer het aantal autoclickers
+                game.updateClickCount();
+                game.checkUpgrades();
+                game.saveProgress();
             }
-   
-            startAutoclicker(game) {
-                setInterval(() => {
-                    if (this.count > 0) {
-                        game.count += this.count; // Verhoogt de clicks met het aantal autoclickers
-                        game.updateClickCount();
-                        game.checkUpgrades();
-                        game.saveProgress();
-                    }
-                }, 1000);
-            }
+        }, 1000);
+    }
         }
    
         class ClickerGame {
