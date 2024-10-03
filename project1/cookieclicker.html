@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Basketball Clicker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+            background-image: url('nba.jpg');
+            background-size: cover;
+            background-position: center;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            position: relative;
+        }
+        .container {
+            background-color: rgba(50, 47, 47, 0.7);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.5);
+            max-width: 600px;
+            max-height: 600px;
+        }
+        .top-right-link {
+            position: absolute;
+            top: 0px;
+            right: 20px;
+        }
+        .top-right-link a {
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 10px 15px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        .top-right-link a:hover {
+            background-color: rgba(255, 0, 0, 0.7);
+        }
+        button {
+            background-color: #ffffff;
+            color: black;
+            border: none;
+            padding: 10px 20px;
+            font-size: 18px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:disabled {
+            background-color: #545454;
+            cursor: not-allowed;
+        }
+        button:hover:not(:disabled) {
+            background-color: #ff0000;
+        }
+        #clickButton img {
+            width: 150px;
+            height: auto;
+            border-radius: 50%;
+            transition: transform 0.2s;
+        }
+        #clickButton img:active {
+            transform: scale(0.9);
+        }
+        .upgrade-list {
+            margin-top: 20px;
+            text-align: left;
+            font-size: 14px;
+        }
+        .upgrade-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+        .upgrade-button {
+            flex: 1 1 calc(50% - 10px);
+            transition: transform 0.3s, background-color 0.3s;
+        }
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
+        @keyframes grow {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        .animate-shake {
+            animation: shake 0.5s forwards;
+        }
+        .animate-grow {
+            animation: grow 0.3s forwards;
+        }
+        .autoclicker {
+            margin-top: 20px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-right-link">
+        <a href="https://voorbeeld.com" target="_blank">Offline Multiplayer</a>
+    </div>
+   
+    <div class="container">
+        <button id="clickButton">
+            <img src="download.jpg" alt="Klik om te scoren!" />
+        </button>
+        <p>Aantal klikken: <span id="clickCount">0</span></p>
+ 
+        <div class="upgrade-list">
+            <h3>Jouw upgrades:</h3>
+            <div class="upgrade-grid" id="upgradeList"></div>
+        </div>
+ 
+        <div class="autoclicker">
+            Aantal autoclickers: <span id="autoclickerCount">0</span>
+        </div>
+        
+        <button id="resetButton">Reset Voortgang</button>
+    </div>  
+
+    <script>
+        class Upgrade {
+            constructor(name, price, id, purchased = false) {
+                this.name = name;
+                this.price = price;
+                this.id = id;
+                this.purchased = purchased;
+            }
+   
+            createButton() {
+                const button = document.createElement('button');
+                button.id = `upgrade-${this.id}`;
+                button.classList.add('upgrade-button');
+                button.textContent = `${this.name} - Kosten: ${this.price} klikken`;
+                button.disabled = this.purchased;
+                return button;
+            }
+   
+            buyUpgrade(game) {
+                if (game.count >= this.price) {
+                    const upgradeButton = document.getElementById(`upgrade-${this.id}`);
+                    upgradeButton.classList.add('animate-shake');
+
+                    setTimeout(() => {
+                        game.count -= this.price;
+                        game.clickValue += 1;
+                        this.purchased = true;
+                        game.updateClickCount();
+                        game.saveProgress();
+
+                        upgradeButton.disabled = true;
+                        upgradeButton.classList.remove('animate-shake');
+                        upgradeButton.classList.add('animate-grow');
+                    }, 500);
+                }
+            }
+        }
+   
+        class Autoclicker {
+            constructor(price) {
+                this.price = price;
+                this.count = 0;
+            }
+   
+            createButton() {
+                const button = document.createElement('button');
+                button.id = 'autoclicker-button';
+                button.textContent = `Autoclicker - Kosten: ${this.price} klikken`;
+                button.disabled = false; // Autoclicker knop is standaard actief
+                return button;
+            }
+   
+            buyAutoclicker(game) {
+                if (game.count >= this.price) {
+                    game.count -= this.price;
+                    this.count += 1;
+                    game.updateClickCount();
+                    game.updateAutoclickerCount();
+                    game.saveProgress();
+
+                    // Verhoog de prijs voor de volgende autoclicker met 1,2
+                    this.price = Math.round(this.price * 1.2);
+
+                    // Update de knop tekst met de nieuwe prijs
+                    const autoclickerButton = document.getElementById('autoclicker-button');
+                    autoclickerButton.textContent = `Autoclicker - Kosten: ${this.price} klikken`;
+                }
+            }
+   
+            startAutoclicker(game) {
+                setInterval(() => {
+                    if (this.count > 0) {
+                        game.count += this.count; // Verhoogt de clicks met het aantal autoclickers
+                        game.updateClickCount();
+                        game.checkUpgrades();
+                        game.saveProgress();
+                    }
+                }, 1000);
+            }
+        }
+   
+        class ClickerGame {
+            constructor() {
+                this.count = Number(localStorage.getItem('clickCount')) || 0;
+                this.clickValue = 1;
+
+                this.upgradePrices = [10, 50, 100, 200, 500, 1000, 2000, 5000];
+                this.upgradeNames = ["Extra Click", "Double Wopper Click", "Triple Patjek Click", "Ultiem Delta Click", "Ultra Loleng Click", "Carlolo Click", "Hyper ShadeusClick", "Shane Bholeus Click"];
+                this.upgrades = [];
+                this.autoclicker = new Autoclicker(100);
+   
+                this.clickButton = document.getElementById('clickButton');
+                this.clickCountElement = document.getElementById('clickCount');
+                this.upgradeListElement = document.getElementById('upgradeList');
+                this.autoclickerCountElement = document.getElementById('autoclickerCount');
+
+                this.loadUpgrades();
+
+                this.clickButton.addEventListener('click', () => this.handleClick());
+                document.getElementById('resetButton').addEventListener('click', () => this.resetProgress());
+   
+                this.renderUpgrades();
+                this.autoclicker.startAutoclicker(this);
+                this.updateClickCount();
+                this.updateAutoclickerCount();
+            }
+   
+            handleClick() {
+                this.count += this.clickValue;
+                this.updateClickCount();
+                this.checkUpgrades();
+                this.saveProgress();
+            }
+   
+            updateClickCount() {
+                this.clickCountElement.textContent = this.count;
+            }
+   
+            checkUpgrades() {
+                this.upgrades.forEach((upgrade) => {
+                    const upgradeButton = document.getElementById(`upgrade-${upgrade.id}`);
+                    upgradeButton.disabled = this.count < upgrade.price || upgrade.purchased;
+                });
+   
+                const autoclickerButton = document.getElementById('autoclicker-button');
+                autoclickerButton.disabled = this.count < this.autoclicker.price;
+            }
+   
+            loadUpgrades() {
+                const upgradesData = JSON.parse(localStorage.getItem('upgrades')) || [];
+                this.upgrades = this.upgradeNames.map((name, index) => {
+                    const purchased = upgradesData[index] || false;
+                    return new Upgrade(name, this.upgradePrices[index], index, purchased);
+                });
+                this.autoclicker.count = Number(localStorage.getItem('autoclickerCount')) || 0;
+                this.autoclicker.price = 100; // Reset de prijs van de autoclicker
+            }
+
+            renderUpgrades() {
+                this.upgradeListElement.innerHTML = '';
+                
+                this.upgrades.forEach((upgrade) => {
+                    const upgradeButton = upgrade.createButton();
+                    upgradeButton.addEventListener('click', () => {
+                        upgrade.buyUpgrade(this);
+                    });
+                    this.upgradeListElement.appendChild(upgradeButton);
+                });
+   
+                const autoclickerButton = this.autoclicker.createButton();
+                autoclickerButton.addEventListener('click', () => {
+                    this.autoclicker.buyAutoclicker(this);
+                });
+                this.upgradeListElement.appendChild(autoclickerButton);
+            }
+   
+            updateAutoclickerCount() {
+                this.autoclickerCountElement.textContent = this.autoclicker.count;
+            }
+
+            saveProgress() {
+                localStorage.setItem('clickCount', this.count);
+                localStorage.setItem('upgrades', JSON.stringify(this.upgrades.map(upgrade => upgrade.purchased)));
+                localStorage.setItem('autoclickerCount', this.autoclicker.count);
+            }
+
+            resetProgress() {
+                this.count = 0;
+                this.clickValue = 1;
+                this.upgrades = this.upgradeNames.map((name, index) => new Upgrade(name, this.upgradePrices[index], index, false));
+                this.autoclicker.count = 0;
+                this.autoclicker.price = 100; // Reset de prijs van de autoclicker
+
+                this.saveProgress();
+                this.updateClickCount();
+                this.renderUpgrades();
+                this.updateAutoclickerCount();
+            }
+        }
+   
+        document.addEventListener('DOMContentLoaded', () => {
+            new ClickerGame();
+        });
+    </script>  
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Basketball Clicker - Hoofdmenu</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            background-image: url('nba.jpg'); /* Default theme */
+            background-size: cover;
+            background-position: center;
+        }
+        button, select {
+            background-color: #ffffff;
+            color: black;
+            border: none;
+            padding: 10px 20px;
+            font-size: 18px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px;
+            transition: background-color 0.3s;
+        }
+        button:hover, select:hover {
+            background-color: #ff0000;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        .instructions {
+            max-width: 400px;
+            margin: 20px auto;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Welkom bij Basketball Clicker!</h1>
+    <button onclick="startGame()">Start Spel</button>
+    <button onclick="showInstructions()">Instructies</button>
+
+    <label for="themeSelect">Kies een thema:</label>
+    <select id="themeSelect" onchange="changeTheme()">
+        <option value="nba.jpg">NBA</option>
+        <option value="bulls.jpg">Chicago Bulls</option>
+        <option value="Lakers.webp">Lakers</option>
+    </select>
+
+    <div id="instructions" class="instructions" style="display:none;">
+        <h2>Instructies</h2>
+        <p>Klik op de knop om punten te scoren!</p>
+        <p>Gebruik de verzamelde punten om upgrades en autoclickers te kopen.</p>
+        <p>Probeer zoveel mogelijk punten te verzamelen!</p>
+        <button onclick="hideInstructions()">Sluit</button>
+    </div>
+
+    <script>
+        function startGame() {
+            window.location.href = 'cookieclicker.html'; // Zorg ervoor dat dit verwijst naar je clicker spel bestand
+        }
+
+        function showInstructions() {
+            document.getElementById('instructions').style.display = 'block';
+        }
+
+        function hideInstructions() {
+            document.getElementById('instructions').style.display = 'none';
+        }
+
+        function changeTheme() {
+            const selectedTheme = document.getElementById('themeSelect').value;
+            document.body.style.backgroundImage = `url('${selectedTheme}')`;
+        }
+    </script>
+</body>
+</html>
