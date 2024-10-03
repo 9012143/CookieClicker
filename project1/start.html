@@ -10,17 +10,17 @@
             margin: 0;
             padding: 20px;
             text-align: center;
+            background-image: url('nba.jpg');
+            background-size: cover;
+            background-position: center;
             height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             color: white;
-            background-image: url('nba.jpg'); /* Default theme */
-            background-size: cover;
-            background-position: center;
         }
-        button, select {
+        button {
             background-color: #ffffff;
             color: black;
             border: none;
@@ -31,7 +31,7 @@
             margin: 10px;
             transition: background-color 0.3s;
         }
-        button:hover, select:hover {
+        button:hover {
             background-color: #ff0000;
         }
         h1 {
@@ -50,13 +50,6 @@
     <h1>Welkom bij Basketball Clicker!</h1>
     <button onclick="startGame()">Start Spel</button>
     <button onclick="showInstructions()">Instructies</button>
-
-    <label for="themeSelect">Kies een thema:</label>
-    <select id="themeSelect" onchange="changeTheme()">
-        <option value="nba.jpg">NBA</option>
-        <option value="bulls.jpg">Chicago Bulls</option>
-        <option value="Lakers.webp">Lakers</option>
-    </select>
 
     <div id="instructions" class="instructions" style="display:none;">
         <h2>Instructies</h2>
@@ -77,11 +70,6 @@
 
         function hideInstructions() {
             document.getElementById('instructions').style.display = 'none';
-        }
-
-        function changeTheme() {
-            const selectedTheme = document.getElementById('themeSelect').value;
-            document.body.style.backgroundImage = `url('${selectedTheme}')`;
         }
     </script>
 </body>

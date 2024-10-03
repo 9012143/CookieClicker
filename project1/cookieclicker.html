@@ -33,7 +33,7 @@
             top: 0px;
             right: 20px;
         }
-        .top-right-link a {
+        .top-right-link a, .top-right-link select {
             color: white;
             text-decoration: none;
             font-size: 16px;
@@ -41,8 +41,9 @@
             padding: 10px 15px;
             border-radius: 5px;
             transition: background-color 0.3s;
+            margin-left: 10px;
         }
-        .top-right-link a:hover {
+        .top-right-link a:hover, .top-right-link select:hover {
             background-color: rgba(255, 0, 0, 0.7);
         }
         button {
@@ -112,7 +113,12 @@
 </head>
 <body>
     <div class="top-right-link">
-        <a href="https://voorbeeld.com" target="_blank">Offline Multiplayer</a>
+        <a href="javascript:void(0)" onclick="goBack()">Terug naar Hoofdmenu</a>
+        <select id="themeSelector">
+            <option value="nba">NBA</option>
+            <option value="dark">Lakers</option>
+            <option value="light">Bulls</option>
+        </select>
     </div>
    
     <div class="container">
@@ -228,11 +234,13 @@
                 this.clickCountElement = document.getElementById('clickCount');
                 this.upgradeListElement = document.getElementById('upgradeList');
                 this.autoclickerCountElement = document.getElementById('autoclickerCount');
+                this.themeSelector = document.getElementById('themeSelector');
 
                 this.loadUpgrades();
 
                 this.clickButton.addEventListener('click', () => this.handleClick());
                 document.getElementById('resetButton').addEventListener('click', () => this.resetProgress());
+                this.themeSelector.addEventListener('change', () => this.changeTheme());
    
                 this.renderUpgrades();
                 this.autoclicker.startAutoclicker(this);
@@ -311,8 +319,27 @@
                 this.renderUpgrades();
                 this.updateAutoclickerCount();
             }
+
+            changeTheme() {
+                const theme = this.themeSelector.value;
+                switch (theme) {
+                    case 'nba':
+                        document.body.style.backgroundImage = "url('nba.jpg')";
+                        break;
+                    case 'light':
+                        document.body.style.backgroundImage = "url('bulls.jpg')";
+                        break;
+                    case 'dark':
+                        document.body.style.backgroundImage = "url('Lakers.webp')";
+                        break;
+                }
+            }
         }
    
+     function goBack(){
+        window.location.href = 'start.html';
+     }
+
         document.addEventListener('DOMContentLoaded', () => {
             new ClickerGame();
         });
